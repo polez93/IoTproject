@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Export</title>
+</head>
+<body>
+    <h1>Exported Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Sensor</th>
+                <th>Valor</th>
+                <th>Hora</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ data.sensor.name }}</td>
+                <td>{{ data.valor }}</td>
+                <td>{{ data.hora }}</td>
+                <td>{{ data.fecha }}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

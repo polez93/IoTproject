@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1 col-sm-10 offset-sm-2 mt-4 card card-body ">
+            <div class="d-flex justify-content-between align-items-center text-center pb-3">
+                <h2 class="display-3 text-success strong">Instalaciones/{{nombre_granja}}</h2>
+            </div>
+           <div class="card card-body">
+            <table id="instalacionesData" class="display">
+                <thead>
+                  <tr>
+                      <th>Referencia</th>
+                      <th>Cliente</th>
+                      <th>Acciones</th>
+                  </tr>
+              </thead>
+              <tbody>
+                 {%for instalacion in instalaciones %}
+                  <tr>
+                    <td>{{instalacion.referencia}}</td>
+                    <td>{{instalacion.granja.cliente.nombre}}</td>
+                    <td>
+                        <a href="{% url 'instalacion_detail' instalacion.id %}" type="button" class="btn btn-warning">Modificar</a>
+                        <a href="{% url 'sensores' instalacion.id %}" class="btn btn-success">Ver Sensores</a>
+                     </td>
+                  </tr>
+                 {% endfor %}
+              </tbody>
+              </table>
+           </div>
+              <script>
+                $(document).ready(function() {
+                    $('#instalacionesData').DataTable();
+                });
+            </script>
+            
+        </div>
+    </div>
+</main>
+{% endblock %}

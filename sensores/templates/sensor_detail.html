@@ -1,0 +1,164 @@
+{% extends 'Dashboard.html' %}
+{% block info_content %}
+<div class="d-flex row">
+  <div class="col-auto col-sm-12 col-md-5 col-xl-5 mt-2">
+    <div class="card card-body">
+      <table id="sensorData" class="display">
+        <thead>
+          <tr>
+            <th>Sensor</th>
+            <th>Valor</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for lectura in lecturas%}
+          <tr>
+            <td>{{lectura.sensor.nombre}}</td>
+            <td>{{lectura.valor}}</td>
+            <td>{{lectura.fecha}}</td>
+            <td>{{lectura.hora}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div id="dataContainer">
+
+      </div>
+    </div>
+    <script>
+      $(document).ready(function () {
+        $('#sensorData').DataTable();
+      });
+    </script>
+  </div>
+  <div class="col-auto col-sm-12 col-md-7 col-xl-7 mt-2">
+    <div class="row">
+      <div class="col-4">
+        <div class="card card-body mb-2">
+          <table class="table">
+            <tbody>
+              <tr>
+                <th>Sensor</th>
+                <td>{{sensor.nombre}}</td>
+              </tr>
+              <tr>
+                <th>Parámetro</th>
+                <td>{{sensor.parametro}}</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card card-body">
+          <label for="stepselect">Lapsos</label>
+          <select name="" id="stepselect" class="form-control">
+            <option value="60">1 hora</option>
+            <option value="30">30 min.</option>
+            <option value="10">10 min.</option>
+            <option value="1">1 min.</option>
+          </select>
+
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card card-body">
+          <p>Exportar</p>
+        <div class="btn-group btn-group-sm" role="group" aria-label="...">
+          <a href="{% url 'generate_pdf' sensor.id %}" class="btn btn-outline-danger">PDF</a>
+          <button type="button" class="btn btn-outline-success">Excel</button>
+          <button type="button" class="btn btn-outline-secondary">otro</button>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-body">
+      <canvas class="rounded" id="sensorChart" style="height: 55vh;"></canvas>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+{% load static %}
+<script src="{% static 'js/script.js' %}"></script>
+<script>
+  let sensorChart
+  let sensor_id = {{ sensor.id }}
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    sensorChart = new Chart(ctx, {
+      type: 'line', // Tipo de gráfico, puede ser 'bar', 'line', 'pie', etc.
+      data: {
+        labels: {{ horas| safe }}, // Fechas de ventas
+    datasets: [{
+      label: `Valores del sendor {{sensor.nombre}}`,
+      data: {{ valores| safe }}, // Cantidades de ventas
+    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+    borderColor: 'rgba(75, 192, 192, 1)',
+    borderWidth: 1
+                    }]
+                },
+    options: {
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Tiempo (MM:SS)'
+        }
+      },
+      y: {
+        beginAtZero: true
+      }
+    },
+    plugins: {
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'x',
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true
+          },
+          mode: 'x',
+        }
+      }
+    }
+  }
+        });
+        });
+
+  function lectura_update(id) {
+    axios.get(`/get_lecturas/${id}/`)
+      .then(response => {
+        const lecturas = response.data.lecturas;
+        const valores = [];
+        const horas = [];
+        lecturas.forEach(lectura => {
+          valores.push(lectura.valor);
+          horas.push(lectura.hora);
+        });
+        sensorChart.data.labels = horas;
+        sensorChart.data.datasets[0].data = valores;
+        sensorChart.update();
+        console.log('graf actualizado')
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  }
+
+  window.onload = function () {
+    lectura_update(sensor_id);  // Initial fetch with the ID
+    setInterval(() => lectura_update(sensor_id), 10000);  // Fetch readings every 10 seconds with the ID
+  };
+
+</script>
+
+{% endblock %}

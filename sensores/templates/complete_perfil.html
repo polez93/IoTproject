@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="container">
+    <div class="row">
+        <div class="col-md-4 offset-md-4 mt-4">
+            <form action="/cliente_create" method="POST" class="card card-body">
+                <h1>Completar Perfil</h1>
+                {{ error }}
+                {% csrf_token %}
+                {{form.as_p}}
+                <button class="btn btn-secondary ms-5 me-5">Save</button>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

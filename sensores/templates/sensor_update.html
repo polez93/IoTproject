@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-auto card p-4 mt-4">
+            <h1 class="text-secondary">Sensor: {{sensor.nombre}}</h1>
+            {{error}}
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <button class="btn btn-success">
+                    Actualizar
+                </button>
+            </form>
+           <div class="row mt-4">
+
+                <form action="{% url 'sensor_delete' sensor.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+</main>
+
+{% endblock %}

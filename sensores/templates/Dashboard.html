@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto col-sm-3 col-md-3 col-xl-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <a href="{%url 'Dashboard'%}"
+                    class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <span class="fs-5 d-none d-sm-inline"><i class="fa-solid fa-bars"></i> Menu</span>
+                </a>
+             
+                    {% if instalaciones %}
+                        <a href="/sensor/create" class="btn btn-success">Sensor <i class="fa-solid fa-plus"></i></a>
+                    {% endif %}
+          
+
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center mt-2 align-items-sm-start"
+                    id="menu" style="width: 100%;">
+                    {% for cliente in clientes %}
+                    <p>
+                        <button class="btn btn-secondary  btn-sm" type="button" style="width: 100%;"
+                            data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false"
+                            aria-controls="collapseExample">
+                            <span class="text-lowercase"><i class="fa-solid fa-user-gear"></i> {{cliente.nombre}}</span>
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapseExample">
+                        <div class="btn-group mb-3">
+                            <button class="btn btn-secondary btn-sm" type="button">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/granja/create"><i class="fa-solid fa-tractor"></i>
+                                        Granja</a></li>
+                                {% if granjas %}
+                                <li><a class="dropdown-item" href="/instalacion/create"><i
+                                            class="fa-regular fa-object-ungroup"></i> Instalación</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                            <button class="btn btn-secondary btn-sm ms-1" type="button">
+                                <i class="fa-solid fa-pen-to-square"></i>Editar
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/granjas"><i class="fa-solid fa-tractor"></i>
+                                        Granja</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% for granja in granjas %}
+                    <li class="mb-1">
+
+                        <i class="fa-solid fa-tractor"></i> <strong class="text-white"> {{ granja.nombre }}</strong>
+
+
+                        <ul style="list-style-type: none;">
+                            {% for instalacion in granja.instalaciones.all %}
+                            <li>
+                                <a class="btn btn-dark" data-bs-toggle="collapse" href="#collapse{{instalacion.id}}"
+                                    aria-expanded="false" aria-controls="collapseExample">
+                                    </i><span class="text-sm-start text-nowrap fs-6"> {{instalacion.referencia}}</span>
+                                </a>
+                                <div class="collapse" id="collapse{{instalacion.id}}">
+                                    <div class="card m-1">
+                                        <ul style="list-style-type: none;">
+                                            {% for sensor in instalacion.sensores.all %}
+                                            <li><a class="dropdown-item" href="{%url 'sensor_detail' sensor.id %}"><i
+                                                        class="fa-solid fa-temperature-high"></i>{{ sensor.nombre }}</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+
+
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <div class="col-auto col-sm-8 col-md-9 col-xl-10 p-3">
+            {% block info_content %}
+            <div class="text-center" style="width: 100%;">
+                <h1 class="poetsen-one-regular">Lo hacemos parecer facil</h1>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

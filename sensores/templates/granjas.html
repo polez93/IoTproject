@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1 col-sm-10 offset-sm-2 mt-4">
+            {% if messages %}
+            <div class="messages alert alert-success">
+                {% for message in messages %}
+                <span>{{ message }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="text-center">
+                <span class="display-5 text-success">Granjas</span>
+            </div>
+            <div class="card card-body">
+                <table id="granjasData" class="display">
+                    <thead>
+                        <tr>
+                            <th>Granja</th>
+                            <th>Cliente</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for granja in granjas %}
+                        <tr>
+                            <td>{{granja.nombre}}</td>
+                            <td>{{granja.cliente.nombre}}</td>
+                            <td>
+                                <a href="{% url 'granja_detail' granja.id %}" type="button"
+                                    class="btn btn-warning">Modificar</a>
+                                <a href="{% url 'instalaciones' granja.id %}" type="button" class="btn btn-success">Ver
+                                    Instalaciones</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('#granjasData').DataTable();
+                });
+            </script>
+
+        </div>
+    </div>
+</main>
+{% endblock %}

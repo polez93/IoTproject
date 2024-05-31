@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<main class="container">
+    <div class="row d-flex justify-content-center">
+        <section class="col-md-4 col-sm-8 mt-5">
+            <form action="/signin/" method="POST" class="card card-body">
+                {% csrf_token %}
+                <h1 class="text-center">Signin</h1>
+                {{error}}
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username">Username</label>
+                            <input type="text" name="username" class="form-control" id="username" placeholder="Write your username">
+                        </div>
+            
+                        <div class="mb-3">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" class="form-control" id="password" placeholder="password">
+                        </div>
+                  
+                <button type="submit" class="btn btn-secondary">
+                    Signin
+                </button>
+            </form>
+        </section>
+    </div>
+    
+</main>
+
+{% endblock %}

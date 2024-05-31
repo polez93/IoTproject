@@ -1,0 +1,26 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<main class="container py-5">
+    <div class="row d-flex justify-content-center">
+        <div class="col-sm-10 col-md-10">
+            <section class="card card-body vw-max-100">
+                <h2 class="display-1 text-center">APP IoT</h2>
+                <p class="display-3">Descripción del proyecto</p>
+                {% if user.is_authenticated %}
+                <div class="text-center mt-4">
+                    <h2 class="poetsen-one-regular">BIENVENIDO! {{user.username}}</h2>
+                </div>
+                {% else %}
+                <div class="text-center mt-4">
+                    <a href="/signin" class="btn btn-secondary">Inicio Sesion</a>
+                    <a href="/signup" class="btn btn-secondary">Registro</a>
+                </div>
+                {% endif %}
+            </section>
+
+
+        </div>
+    </div>
+</main>
+{% endblock %}

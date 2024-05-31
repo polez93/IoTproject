@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="container">
+    <div class="row">
+        <div class="col-md-4 offset-md-4 card p-4 mt-4">
+            <h1 class="text-secondary">{{granja.nombre}}</h1>
+            {{error}}
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <button class="btn btn-success">
+                    Actualizar
+                </button>
+            </form>
+            <div class="row mt-4">
+
+                <form action="{% url 'granja_delete' granja.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+</main>
+
+{% endblock %}
