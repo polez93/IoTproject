@@ -1,0 +1,166 @@
+{% extends 'Dashboard.html' %}
+{% block info_content %}
+<div class="d-flex row">
+  <div class="col-auto col-sm-12 col-md-5 col-xl-5 mt-2">
+    <div class="card card-body">
+      <table id="sensorDataFiltre" class="display">
+        <thead>
+          <tr>
+            <th>Sensor</th>
+            <th>Valor</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for lectura in lecturas%}
+          <tr>
+            <td>{{lectura.sensor.nombre}}</td>
+            <td>{{lectura.valor}}</td>
+            <td>{{lectura.fecha}}</td>
+            <td>{{lectura.hora}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <script>
+      $(document).ready(function () {
+        $('#sensorDataFiltre').DataTable({
+          dom: 'Bfrtip',
+          buttons: [
+            {
+              extend: 'csv',
+              title: 'Datos en CSV'
+            },
+            {
+              extend: 'excel',
+              title: 'Datos en Excel'
+            },
+            {
+              extend: 'pdf',
+              title: 'Datos en PDF',
+              orientation: 'landscape',
+              pageSize: 'A4'
+            }
+          ]
+        });
+      });
+    </script>
+  </div>
+  <div class="col-auto col-sm-12 col-md-7 col-xl-7 mt-2">
+    <div class="row mb-2">
+      <div class="col-4">
+        <div class="card mb-2 p-2"><a class="text-decoration-none" href="{%url 'sensor_detail' sensor.id %}">
+          <strong class="fs-3">Sensor: {{sensor.nombre}}</strong>
+
+          <strong>Parámetro: {{sensor.parametro}}</strong></a>
+        </div>
+      </div>
+      <div class="col-4">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <i class="fa-solid fa-filter"></i>  Filtro
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Filtro por Fecha</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form method="GET" action="{% url 'lecturaByDate' sensor.id %}">
+                    <label for="date_desde">Seleccione la fecha</label>
+                    <input type="date" class="form-control" name="date_desde" id="date_desde">                  
+                    <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
+                  </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-4">
+        <div class="card card-body">
+           Resultado para la fecha:  <strong>{{fecha_filtro}}</strong>
+        </div>
+      </div>
+    </div>
+    <div class="card card-body">
+      <canvas class="rounded" id="sensorChartfilter" style="height: 55vh;"></canvas>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+{% load static %}
+<script src="{% static 'js/script.js' %}"></script>
+<script>
+  let sensorChart
+  let sensor_id = {{ sensor.id }}
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('sensorChartfilter').getContext('2d');
+    sensorChart = new Chart(ctx, {
+      type: 'line', // Tipo de gráfico, puede ser 'bar', 'line', 'pie', etc.
+      data: {
+        labels: {{ horas| safe }}, // Fechas de ventas
+    datasets: [{
+      label: `Valores del sendor {{sensor.nombre}}`,
+      data: {{ valores| safe }}, // Cantidades de ventas
+    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+    borderColor: 'rgba(75, 192, 192, 1)',
+    borderWidth: 1
+                    }]
+                },
+    options: {
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Tiempo (MM:SS)'
+        }
+      },
+      y: {
+        beginAtZero: true
+      }
+    },
+    plugins: {
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'x',
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true
+          },
+          mode: 'x',
+        }
+      }
+    }
+  }
+        });
+        });
+
+</script>
+<script>
+    // Obtiene la fecha de hoy
+    const hoy = new Date();
+    const dia = hoy.getDate().toString().padStart(2, '0');
+    const mes = (hoy.getMonth() + 1).toString().padStart(2, '0'); // Enero es 0
+    const anio = hoy.getFullYear();
+  
+    // Formatea la fecha en formato YYYY-MM-DD
+    const fechaHoy = `${anio}-${mes}-${dia}`;
+  
+    // Establece el valor del input con id 'fecha_hoy'
+    document.getElementById('date_desde').value = fechaHoy;
+  </script>
+
+{% endblock %}

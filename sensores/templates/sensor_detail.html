@@ -1,7 +1,59 @@
 {% extends 'Dashboard.html' %}
 {% block info_content %}
-<div class="d-flex row">
-  <div class="col-auto col-sm-12 col-md-5 col-xl-5 mt-2">
+<div class="row">
+  <div class="col-auto col-sm-12 col-md-6 col-xl-7 mt-2">
+    <div class="row mb-2">
+      <div class="col-4">
+        <div class="card mb-2 p-2">
+          <strong class="fs-3">Sensor: {{sensor.nombre}}</strong>
+
+          <strong>Parámetro: {{sensor.parametro}}</strong>
+        </div>
+      </div>
+      <div class="col-3">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <i class="fa-solid fa-filter"></i> Filtro
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Filtro por Fecha</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form method="GET" action="{% url 'lecturaByDate' sensor.id %}">
+                  <label for="date_desde">Seleccione la fecha</label>
+                  <input type="date" class="form-control" name="date_desde" id="date_desde" required>
+
+                  <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-5">
+        <div class="card card-body">
+          <p>Exportar</p>
+          <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            <a href="{% url 'generate_pdf' sensor.id %}" class="btn btn-outline-danger text-nowrap"
+              style="width: 40%;">PDF</a>
+            <a href="{% url 'generate_excel' sensor.id %}" class="btn btn-outline-success text-nowrap"
+              style="width: 40%;">Excel</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-body">
+      <canvas class="rounded" id="sensorChart" style="height: 55vh;"></canvas>
+    </div>
+  </div>
+  <div class="col-auto col-sm-12 col-md-4 col-xl-5 mt-2">
     <div class="card card-body">
       <table id="sensorData" class="display">
         <thead>
@@ -29,55 +81,27 @@
     </div>
     <script>
       $(document).ready(function () {
-        $('#sensorData').DataTable();
+        $('#sensorData').DataTable({
+          dom: 'Bfrtip',
+          buttons: [
+            {
+              extend: 'csv',
+              title: 'Datos en CSV'
+            },
+            {
+              extend: 'excel',
+              title: 'Datos en Excel'
+            },
+            {
+              extend: 'pdf',
+              title: 'Datos en PDF',
+              orientation: 'landscape',
+              pageSize: 'A4'
+            }
+          ]
+        });
       });
     </script>
-  </div>
-  <div class="col-auto col-sm-12 col-md-7 col-xl-7 mt-2">
-    <div class="row">
-      <div class="col-4">
-        <div class="card card-body mb-2">
-          <table class="table">
-            <tbody>
-              <tr>
-                <th>Sensor</th>
-                <td>{{sensor.nombre}}</td>
-              </tr>
-              <tr>
-                <th>Parámetro</th>
-                <td>{{sensor.parametro}}</td>
-              </tr>
-
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="col-4">
-        <div class="card card-body">
-          <label for="stepselect">Lapsos</label>
-          <select name="" id="stepselect" class="form-control">
-            <option value="60">1 hora</option>
-            <option value="30">30 min.</option>
-            <option value="10">10 min.</option>
-            <option value="1">1 min.</option>
-          </select>
-
-        </div>
-      </div>
-      <div class="col-4">
-        <div class="card card-body">
-          <p>Exportar</p>
-        <div class="btn-group btn-group-sm" role="group" aria-label="...">
-          <a href="{% url 'generate_pdf' sensor.id %}" class="btn btn-outline-danger">PDF</a>
-          <button type="button" class="btn btn-outline-success">Excel</button>
-          <button type="button" class="btn btn-outline-secondary">otro</button>
-        </div>
-        </div>
-      </div>
-    </div>
-    <div class="card card-body">
-      <canvas class="rounded" id="sensorChart" style="height: 55vh;"></canvas>
-    </div>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -159,6 +183,19 @@
     setInterval(() => lectura_update(sensor_id), 10000);  // Fetch readings every 10 seconds with the ID
   };
 
+</script>
+<script>
+  // Obtiene la fecha de hoy
+  const hoy = new Date();
+  const dia = hoy.getDate().toString().padStart(2, '0');
+  const mes = (hoy.getMonth() + 1).toString().padStart(2, '0'); // Enero es 0
+  const anio = hoy.getFullYear();
+
+  // Formatea la fecha en formato YYYY-MM-DD
+  const fechaHoy = `${anio}-${mes}-${dia}`;
+
+  // Establece el valor del input con id 'fecha_hoy'
+  document.getElementById('date_desde').value = fechaHoy;
 </script>
 
 {% endblock %}

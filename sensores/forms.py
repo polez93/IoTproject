@@ -10,7 +10,7 @@ class ClienteForm(forms.ModelForm):
             'telefono' : forms.TextInput(attrs={'class':'form-control','placeholder':'Numero celular'}),
             'correo' : forms.TextInput(attrs={'class':'form-control','placeholder':'correo electronico'})
         }
-
+  
 class GranjaForm(forms.ModelForm):
     class Meta:
         model = Granja

@@ -42,5 +42,7 @@ urlpatterns = [
     path('signin/', views.signin, name='signin'),
     path('perfil/', views.cliente, name='perfil'),
     path('cliente_create', views.complete_perfil, name='cliente_create'),
-    path('generate_pdf/<int:sensor_id>/', views.generate_pdf, name='generate_pdf')
+    path('generate_pdf/<int:sensor_id>/', views.generate_pdf, name='generate_pdf'),
+    path('generate_excel/<int:sensor_id>/', views.generate_excel, name='generate_excel'),
+    path('lecturasByDate/<int:sensor_id>/', views.lecturaByDate, name = 'lecturaByDate')
 ]

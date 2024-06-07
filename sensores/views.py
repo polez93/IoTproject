@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
@@ -12,8 +12,11 @@ from reportlab.lib import colors
 from reportlab.graphics.charts.lineplots import LinePlot
 from reportlab.graphics.charts.axes import XValueAxis, YValueAxis
 from reportlab.graphics.shapes import Drawing
+from openpyxl import Workbook
+from openpyxl.chart import LineChart, Reference
+from openpyxl.styles import Alignment
 import io
-import datetime
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from .forms import ClienteForm, GranjaForm, InstalacionForm, SensorForm
@@ -24,6 +27,36 @@ from .models import Cliente, Granja, Instalacion, Sensor, Lectura
 
 def home(request):
     return render(request, 'home.html')
+
+def lecturaByDate(request, sensor_id):
+    sensor = get_object_or_404(Sensor, pk=sensor_id)
+    lecturas = []
+    # Obtener los parámetros desde y hasta de la URL
+    dateSelected = request.GET.get('date_desde')
+
+    date = datetime.fromisoformat(dateSelected)
+
+
+
+    if request.method == 'GET':      
+        lecturas = Lectura.objects.filter(sensor=sensor, fecha=dateSelected)
+        clientes = Cliente.objects.filter(user=request.user)
+        horas = [lectura.hora.strftime('%H:%M:%S') for lectura in lecturas]
+        valores = [float(lectura.valor) for lectura in lecturas]
+        granjas = Granja.objects.all().prefetch_related('instalaciones__sensores').filter(cliente__user=request.user)
+
+        context = {
+            'clientes': clientes,
+            'granjas': granjas,
+            'horas': horas,
+            'valores': valores,
+            'lecturas': lecturas,
+            'sensor': Sensor.objects.get(pk=sensor_id),
+            'fecha_filtro' : date.strftime('%d-%m-%Y')
+            }
+        return render(request, 'lecturasByDate.html', context)    
+  
+
 
 def generate_pdf(request, sensor_id):
     response = HttpResponse(content_type='application/pdf')
@@ -100,6 +133,47 @@ def generate_pdf(request, sensor_id):
     response.write(buffer.read())
     buffer.close()
 
+    return response
+
+def generate_excel(request, sensor_id):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="lecturas.xlsx"'
+
+    # Crear un libro de Excel y obtener la hoja activa
+    wb = Workbook()
+    ws = wb.active
+    
+    # Añadir encabezados
+    ws.append(['Fecha', 'Valor', 'Sensor'])
+
+    # Obtener datos del modelo y añadirlos a la hoja
+    lecturas = Lectura.objects.filter(sensor=sensor_id)
+    for lectura in lecturas:
+        ws.append([lectura.hora, float(lectura.valor), str(lectura.sensor)])
+
+    ws.merge_cells('D1:G1')
+    ws['D1'] = 'Resumen de medidas'
+    ws['D1'].alignment = Alignment(horizontal='center', vertical='center')
+
+    # Crear el gráfico de líneas
+    chart = LineChart()
+    chart.title = "Gráfico de Lecturas"
+    chart.x_axis.title = 'Hora de Lectura'
+    chart.y_axis.title = 'Valor de Lectura'
+
+    # Establecer las categorías (fechas)
+    categories = Reference(ws, min_col=1, min_row=2, max_row=len(lecturas) + 1)
+    chart.set_categories(categories)
+
+    # Establecer los datos
+    values = Reference(ws, min_col=2, min_row=1, max_row=len(lecturas) + 1)
+    chart.add_data(values, titles_from_data=True)
+
+    # Agregar el gráfico a la hoja de Excel
+    ws.add_chart(chart, "D2")
+
+    # Guardar el libro de Excel en la respuesta HTTP
+    wb.save(response)
     return response
 
 def signup(request):
@@ -189,6 +263,7 @@ def sensor_detail(request, sensor_id):
         horas = [lectura.hora.strftime('%H:%M:%S') for lectura in lecturas]
         valores = [float(lectura.valor) for lectura in lecturas]
         granjas = Granja.objects.all().prefetch_related('instalaciones__sensores').filter(cliente__user=request.user)
+  
 
         context = {
             'clientes': clientes,
