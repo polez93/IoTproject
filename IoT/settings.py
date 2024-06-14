@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-k3@$+%1p8l!la*!d0r3sp3t4_afjm25=^gkqgrldz@6i$5&@8^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'IoT.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'iot',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',  # O el host donde se encuentra tu servidor MySQL
+        'USER': 'admin',
+        'PASSWORD': 'Adm1nIoT',
+        'HOST': '104.248.50.33',  # O el host donde se encuentra tu servidor MySQL
         'PORT': '3306',  # Puerto predeterminado de MySQL
     }
 }
