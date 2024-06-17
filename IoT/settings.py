@@ -81,8 +81,8 @@ DATABASES = {
         'NAME': 'iot',
         'USER': 'admin',
         'PASSWORD': 'Adm1nIoT',
-        'HOST': '104.248.50.33',  # O el host donde se encuentra tu servidor MySQL
-        'PORT': '3306',  # Puerto predeterminado de MySQL
+        'HOST': '104.248.50.33',  # O el host donde se encuentra tu servidor
+        'PORT': '5432',  #
     }
 }
 
