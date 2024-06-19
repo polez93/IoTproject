@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-k3@$+%1p8l!la*!d0r3sp3t4_afjm25=^gkqgrldz@6i$5&@8^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['146.190.222.135']
 
 
 # Application definition
@@ -77,19 +77,12 @@ WSGI_APPLICATION = 'IoT.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'iot',
-<<<<<<< HEAD
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',  # O el host donde se encuentra tu servidor 
-        'PORT': '3306',  # Puerto predeterminado 
-=======
-        'USER': 'admin',
+        'USER': 'iotuser',
         'PASSWORD': 'Adm1nIoT',
-        'HOST': '104.248.50.33',  # O el host donde se encuentra tu servidor
-        'PORT': '5432',  #
->>>>>>> 14eda68814b06401e06cd99ea23fc61e110d7ca7
+        'HOST': 'localhost',
+        'PORT': '5432',  
     }
 }
 
@@ -132,6 +125,7 @@ USE_TZ = True
 
 # Ruta para archivos estáticos
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Ruta para archivos de medios
