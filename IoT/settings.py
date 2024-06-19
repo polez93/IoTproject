@@ -79,10 +79,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'iot',
+<<<<<<< HEAD
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',  # O el host donde se encuentra tu servidor 
         'PORT': '3306',  # Puerto predeterminado 
+=======
+        'USER': 'admin',
+        'PASSWORD': 'Adm1nIoT',
+        'HOST': '104.248.50.33',  # O el host donde se encuentra tu servidor
+        'PORT': '5432',  #
+>>>>>>> 14eda68814b06401e06cd99ea23fc61e110d7ca7
     }
 }
 
